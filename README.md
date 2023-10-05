@@ -11,6 +11,6 @@ To configure the code with your desired parameters you can edit the `config.yaml
 For example, you can change the `ENV` flag with your desired gym environment.
 
 ### Run
-To run the code you can run `main.py` which will train a LinearRL agent on the specified gym environment.
+To train the LinearRL model you can run `train.py` which will train a LinearRL agent on the specified gym environment.
 ```bash
-python main.py
+python src/train.py
