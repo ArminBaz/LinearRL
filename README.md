@@ -1,7 +1,17 @@
 # LinearRL - Python Implementation
 This repository is a Python implementation of LinearRL originally formulated by Piray et al. <br>
 The original work can be found here: ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3). 
+
 ## Introduction
 The code converts the LinearRL framework introduced by Piray et al. into a Python framework. Additionally, it is converted to be used with OpenAI's Gym reinforcement learning environments. <br> <br>
 Currently, the framework is designed to work with tabular environments.
+
 ## Usage
+### Configuration
+To configure the code with your desired parameters you can edit the `config.yaml` file. <br>
+For example, you can change the `ENV` flag with your desired gym environment.
+
+### Run
+To run the code you can run `main.py`.
+```bash
+python main.py
