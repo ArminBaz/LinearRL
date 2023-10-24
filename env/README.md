@@ -9,7 +9,7 @@ I create a similar maze to that was used in the linear RL paper (fig 2d.)
 
 ## Cognitive Neuroscience
 ### Hairpin Maze
-
+Hairpin maze inspired by [Derdikman et al.](https://www.nature.com/articles/nn.2396)
 
 ### Tolman's Detour Task
-Maze environment inspired by [Tolman's detour task ](https://psycnet.apa.org/record/1949-00103-001)
+Maze environment inspired by [Tolman's detour task ](https://psycnet.apa.org/record/1949-00103-001).
