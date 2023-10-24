@@ -9,7 +9,7 @@ from gymnasium.utils import seeding
 class MazeEnv(gym.Env):
     def __init__(self, maze_file):
         # read maze_file
-        self.maze = np.array(np.load(file=maze_file))
+        self.maze = self._read_maze_file(maze_file=maze_file)
 
         # get important positions
         self.start_pos = np.where(self.maze == 'S')
@@ -111,5 +111,12 @@ class MazeEnv5x5(MazeEnv):
     def __init__(self):
         super(MazeEnv5x5, self).__init__(maze_file="maze2d_5x5.npy")
 
-if __name__ == '__main__':
-    env = MazeEnv(maze_file="maze2d_5x5.npy")
+# if __name__ == '__main__':
+#     # Test it out
+#     env = MazeEnv(maze_file="maze2d_5x5.npy")
+#     obs = env.reset()
+#     done = True
+#     while done:
+#         env.render()
+#         pygame.time.wait(5000)
+#         done = False
