@@ -7,6 +7,8 @@ from gymnasium import error, spaces, utils
 from gymnasium.utils import seeding
 
 class MazeEnv(gym.Env):
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
+
     def __init__(self, maze_file, enable_render):
         # read maze_file
         self.maze = self._read_maze_file(maze_file=maze_file)
@@ -15,17 +17,30 @@ class MazeEnv(gym.Env):
         self._enable_render = enable_render
 
         # get important positions
-        self.start_pos = np.where(self.maze == 'S')
-        self.goal_pos = np.where(self.maze == 'G')
-        self.current_pos = self.start_pos
+        self._start_loc = np.where(self.maze == 'S')
+        self._target_loc = np.where(self.maze == 'G')
+        self._agent_loc = self._start_loc
 
         self.num_rows, self.num_cols = self.maze.shape
 
         # 4 possible actions: 0=up, 1=down, 2=right, 3=left
         self.action_space = spaces.Discrete(4)
 
-        # Observation space is grid of size:rows x columns
-        self.observation_space = spaces.Tuple((spaces.Discrete(self.num_rows), spaces.Discrete(self.num_cols)))
+        # Observations are dictionaries with the agent's and the target's location.
+        # Each location is encoded as an element of {0, ..., `size`}^2, i.e. MultiDiscrete([size, size]).
+        self.observation_space = spaces.Dict(
+            {
+                "agent": spaces.Box(low=np.array(0,0), high=np.array(self.num_rows-1, self.num_cols-1), shape=(2,), dtype=int),
+                "target": spaces.Box(low=np.array(0,0), high=np.array(self.num_rows-1, self.num_cols-1), shape=(2,), dtype=int),
+            }
+        )
+
+        self._action_to_direction = {
+            0: np.array([1, 0]),
+            1: np.array([0, 1]),
+            2: np.array([-1, 0]),
+            3: np.array([0, -1]),
+        }
 
         # Initialize Pygame
         pygame.init()
@@ -35,41 +50,53 @@ class MazeEnv(gym.Env):
         if self._enable_render is True:
             self.screen = pygame.display.set_mode((self.num_cols * self.cell_size, self.num_rows * self.cell_size))
 
-    def reset(self):
-        self.current_pos = self.start_pos
-        return self.current_pos
+    def reset(self, seed=None):
+        # We need the following line to seed self.np_random
+        super().reset(seed=seed)
+
+        self._agent_loc = self._start_loc
+
+        observation = self._get_obs()
+        info = self._get_info()
+
+        return observation, info
 
     def step(self, action):
-        # Move the agent based on the selected action
-        new_pos = np.array(self.current_pos)
-        if action == 0:  # Up
-            new_pos[0] -= 1
-        elif action == 1:  # Down
-            new_pos[0] += 1
-        elif action == 2:  # Right
-            new_pos[1] += 1
-        elif action == 3:  # Left
-            new_pos[1] -= 1
+        # Get direction
+        direction = self._action_to_direction[action]
+
+        new_loc = np.copy(self._agent_loc)
+        new_loc += direction
 
         # Check if the new position is valid
-        if self._is_valid_position(new_pos):
-            self.current_pos = new_pos
+        if self._is_valid_position(new_loc):
+            self._agent_loc = new_loc
 
         # Reward function
-        if np.array_equal(self.current_pos, self.goal_pos):
+        if np.array_equal(self._agent_loc, self._target_loc):
             reward = 1.0
             done = True
         else:
             reward = 0.0
             done = False
 
-        return self.current_pos, reward, done, {}
+        return self._agent_loc, reward, done, {}
     
     def _read_maze_file(self, maze_file):
         dir_path = os.path.dirname(os.path.abspath(__file__))
         rel_path = os.path.join(dir_path, "maze_files", maze_file)
 
         return np.load(file=rel_path)
+
+    def _get_obs(self):
+        return {"agent": self._agent_loc, "target":self._target_loc}
+    
+    def _get_info(self):
+        return {
+            "distance": np.linalg.norm(
+                self._agent_loc - self._target_loc, ord=1
+            )
+        }
 
     def _is_valid_position(self, pos):
         row, col = pos
@@ -96,7 +123,7 @@ class MazeEnv(gym.Env):
                 cell_top = row * self.cell_size
             
                 try:
-                    print(np.array(self.current_pos)==np.array([row,col]).reshape(-1,1))
+                    print(np.array(self._agent_loc)==np.array([row,col]).reshape(-1,1))
                 except Exception as e:
                     print('Initial state')
 
@@ -104,7 +131,7 @@ class MazeEnv(gym.Env):
                     pygame.draw.rect(self.screen, (0, 0, 0), (cell_left, cell_top, self.cell_size, self.cell_size))
                 elif self.maze[row, col] == 'S':  # Starting position
                     pygame.draw.rect(self.screen, (0, 255, 0), (cell_left, cell_top, self.cell_size, self.cell_size))
-                elif self.maze[row, col] == 'G':  # Goal position
+                elif self.maze[row, col] == 'G':  # Target position
                     pygame.draw.rect(self.screen, (255, 0, 0), (cell_left, cell_top, self.cell_size, self.cell_size))
 
                 if np.array_equal(np.array(self.current_pos), np.array([row, col]).reshape(-1,1)):  # Agent position
