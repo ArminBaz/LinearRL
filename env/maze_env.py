@@ -7,9 +7,12 @@ from gymnasium import error, spaces, utils
 from gymnasium.utils import seeding
 
 class MazeEnv(gym.Env):
-    def __init__(self, maze_file):
+    def __init__(self, maze_file, enable_render):
         # read maze_file
         self.maze = self._read_maze_file(maze_file=maze_file)
+
+        # enable render
+        self._enable_render = enable_render
 
         # get important positions
         self.start_pos = np.where(self.maze == 'S')
@@ -29,7 +32,8 @@ class MazeEnv(gym.Env):
         self.cell_size = 125
 
         # setting display size
-        self.screen = pygame.display.set_mode((self.num_cols * self.cell_size, self.num_rows * self.cell_size))
+        if self._enable_render is True:
+            self.screen = pygame.display.set_mode((self.num_cols * self.cell_size, self.num_rows * self.cell_size))
 
     def reset(self):
         self.current_pos = self.start_pos
@@ -80,6 +84,8 @@ class MazeEnv(gym.Env):
         return True
 
     def render(self):
+        if self._enable_render is False:
+            return
         # Clear the screen
         self.screen.fill((255, 255, 255))  
 
@@ -111,12 +117,17 @@ class MazeEnv5x5(MazeEnv):
     def __init__(self):
         super(MazeEnv5x5, self).__init__(maze_file="maze2d_5x5.npy")
 
-# if __name__ == '__main__':
-#     # Test it out
-#     env = MazeEnv(maze_file="maze2d_5x5.npy")
-#     obs = env.reset()
-#     done = True
-#     while done:
-#         env.render()
-#         pygame.time.wait(5000)
-#         done = False
+class MazeEnvHairpin(MazeEnv):
+    def __init__(self):
+        super(MazeEnvHairpin).__init__(maze_file="hairpin_14x14.npy")
+
+if __name__ == '__main__':
+    # Test it out
+    env = MazeEnv(maze_file="hairpin_14x14.npy")
+    print(env)
+    # obs = env.reset()
+    # done = True
+    # while done:
+    #     env.render()
+    #     pygame.time.wait(5000)
+    #     done = False
