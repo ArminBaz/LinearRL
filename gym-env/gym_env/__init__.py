@@ -17,13 +17,13 @@ register(
 # Tolman detour task
 register(
     id="tolman-9x9-nb",
-    entry_point="gym_env.envs:MazeEnvTolmanV0",
+    entry_point="gym_env.envs:MazeEnvTolmanNB",
     max_episode_steps=2000,
 )
 
 register(
     id="tolman-9x9-b",
-    entry_point="gym_env.envs:MazeEnvTolmanV1",
+    entry_point="gym_env.envs:MazeEnvTolmanB",
     max_episode_steps=2000,
 )
 
