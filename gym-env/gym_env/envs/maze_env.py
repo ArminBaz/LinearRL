@@ -256,9 +256,3 @@ if __name__ == '__main__':
     print(f"Random action: {rand_action}")
     obs, reward, term, _, info = env.step(rand_action)
     print(f"Post step obs: {obs}, reward: {reward}, terminated: {term}, info: {info}")
-    # obs = env.reset()
-    # done = True
-    # while done:
-    #     env.render()
-    #     pygame.time.wait(5000)
-    #     done = False
