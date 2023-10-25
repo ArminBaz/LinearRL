@@ -18,12 +18,12 @@ class MazeEnv(gym.Env):
         self.render_mode = render_mode
 
         # Get important positions
-        start_loc = np.where(self.maze == 'S')
-        target_loc = np.where(self.maze == 'G')
+        start = np.where(self.maze == 'S')
+        target = np.where(self.maze == 'G')
 
-        self._start_loc = np.array([start_loc[0][0], start_loc[1][0]])
-        self._target_loc = np.array([target_loc[0][0], target_loc[1][0]])
-        self._agent_loc = self._start_loc
+        self.start_loc = np.array([start[0][0], start[1][0]])
+        self.target_loc = np.array([target[0][0], target[1][0]])
+        self._agent_loc = self.start_loc
 
         # Size of maze and pygame window
         self.num_rows, self.num_cols = self.maze.shape
@@ -56,7 +56,7 @@ class MazeEnv(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
-        self._agent_loc = self._start_loc
+        self._agent_loc = self.start_loc
 
         observation = self._get_obs()
         info = self._get_info()
@@ -81,7 +81,7 @@ class MazeEnv(gym.Env):
             self._agent_loc = new_loc
 
         # Check if terminated
-        terminated = np.array_equal(self._agent_loc, self._target_loc)
+        terminated = np.array_equal(self._agent_loc, self.target_loc)
         reward = 1 if terminated else 0  # Binary sparse rewards
         
         if self.render_mode == "human":
@@ -102,7 +102,7 @@ class MazeEnv(gym.Env):
         """
         Observation, returns the agent and target positions
         """
-        return {"agent": self._agent_loc, "target":self._target_loc}
+        return {"agent": self._agent_loc, "target":self.target_loc}
     
     def _get_info(self):
         """
@@ -110,7 +110,7 @@ class MazeEnv(gym.Env):
         """
         return {
             "distance": np.linalg.norm(
-                self._agent_loc - self._target_loc, ord=1
+                self._agent_loc - self.target_loc, ord=1
             )
         }
 
@@ -158,7 +158,7 @@ class MazeEnv(gym.Env):
             canvas,
             (255, 0, 0),
             pygame.Rect(
-                pix_square_size * self._target_loc,
+                pix_square_size * self.target_loc,
                 (pix_square_size, pix_square_size),
             ),
         )
@@ -167,7 +167,7 @@ class MazeEnv(gym.Env):
             canvas,
             (0, 255, 0),
             pygame.Rect(
-                pix_square_size * self._start_loc,
+                pix_square_size * self.start_loc,
                 (pix_square_size, pix_square_size),
             ),
         )
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     env = MazeEnv(maze_file="maze2d_5x5.npy")
     # env = MazeEnv(maze_file="hairpin_14x14.npy")
     print(f"env: {env}")
-    print(f"start loc: {env._start_loc}, target loc: {env._target_loc}")
+    print(f"start loc: {env.start_loc}, target loc: {env.target_loc}")
     obs, info = env.reset()
     print(f"Post reset obs: {obs}, info: {info}")
     rand_action = env.action_space.sample()
