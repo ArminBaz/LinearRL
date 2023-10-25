@@ -1,7 +1,9 @@
 # Gymnasium Environments
 This directory contains the code I used to create custom gymnasium environments. <br> <br>
 
-The environments in here are all either environments that were used in the original linear RL paper to demonstrate its effectiveness or cognitive neuroscience inspired environments.
+The environments in here are all either environments that were used in the original linear RL paper to demonstrate its effectiveness or cognitive neuroscience inspired environments. <br> <br>
+
+Note that the mazes *can* be constructed with different values for height and width. However, `render_mode` *must* be set to `None` as I haven't added that functionality for rendering yet.
 
 ## Usage
 The layout of this directory and for creating my own custom gym environments was constructed by following Gymnasium's [tutorial](https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/#make-your-own-custom-environment). <br> <br>

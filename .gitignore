@@ -6,4 +6,6 @@ __pycache__/
 .ipynb_checkpoints/
 .vscode/
 
-gym-maze/
+gym-env/build/
+gym-env/dist/
+gym-env/gym_env.egg-info/
