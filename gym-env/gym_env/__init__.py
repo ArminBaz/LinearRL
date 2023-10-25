@@ -14,6 +14,17 @@ register(
     max_episode_steps=2000,
 )
 
-# 10x10
-
 # Tolman detour task
+register(
+    id="tolman-9x9-v0",
+    entry_point="gym_env.envs:MazeEnvTolmanV0",
+    max_episode_steps=2000,
+)
+
+register(
+    id="tolman-9x9-v1",
+    entry_point="gym_env.envs:MazeEnvTolmanV1",
+    max_episode_steps=2000,
+)
+
+# 10x10
