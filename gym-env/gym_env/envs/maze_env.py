@@ -23,7 +23,7 @@ class MazeEnv(gym.Env):
 
         self.start_loc = np.array([start[0][0], start[1][0]])
         self.target_loc = np.array([target[0][0], target[1][0]])
-        self._agent_loc = self.start_loc
+        self.agent_loc = self.start_loc
 
         # Size of maze and pygame window
         self.num_rows, self.num_cols = self.maze.shape
@@ -56,7 +56,7 @@ class MazeEnv(gym.Env):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
-        self._agent_loc = self.start_loc
+        self.agent_loc = self.start_loc
 
         observation = self._get_obs()
         info = self._get_info()
@@ -73,15 +73,15 @@ class MazeEnv(gym.Env):
         # Get direction
         direction = self._action_to_direction[action]
 
-        new_loc = np.copy(self._agent_loc)
+        new_loc = np.copy(self.agent_loc)
         new_loc += direction
 
         # Check if the new position is valid
         if self._is_valid_position(new_loc):
-            self._agent_loc = new_loc
+            self.agent_loc = new_loc
 
         # Check if terminated
-        terminated = np.array_equal(self._agent_loc, self.target_loc)
+        terminated = np.array_equal(self.agent_loc, self.target_loc)
         reward = 1 if terminated else 0  # Binary sparse rewards
         
         if self.render_mode == "human":
@@ -102,7 +102,7 @@ class MazeEnv(gym.Env):
         """
         Observation, returns the agent and target positions
         """
-        return {"agent": self._agent_loc, "target":self.target_loc}
+        return {"agent": self.agent_loc, "target":self.target_loc}
     
     def _get_info(self):
         """
@@ -110,7 +110,7 @@ class MazeEnv(gym.Env):
         """
         return {
             "distance": np.linalg.norm(
-                self._agent_loc - self.target_loc, ord=1
+                self.agent_loc - self.target_loc, ord=1
             )
         }
 
@@ -175,7 +175,7 @@ class MazeEnv(gym.Env):
         pygame.draw.circle(
             canvas,
             (0, 0, 255),
-            (self._agent_loc + 0.5) * pix_square_size,
+            (self.agent_loc + 0.5) * pix_square_size,
             pix_square_size / 3,
         )
         # Draw horizontal lines
