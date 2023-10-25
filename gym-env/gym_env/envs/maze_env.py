@@ -236,6 +236,14 @@ class MazeEnvHairpin(MazeEnv):
     def __init__(self):
         super(MazeEnvHairpin).__init__(maze_file="hairpin_14x14.npy")
 
+class MazeEnvTolmanV0(MazeEnv):
+    def __init__(self):
+        super(MazeEnvTolmanV0).__init__(maze_file="tolman_9x9_v0.npy")
+
+class MazeEnvTolmanV1(MazeEnv):
+    def __init__(self):
+        super(MazeEnvTolmanV1).__init__(maze_file="tolman_9x9_v1.npy")
+
 if __name__ == '__main__':
     # Test it out
     env = MazeEnv(maze_file="maze2d_5x5.npy")
