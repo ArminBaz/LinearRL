@@ -234,15 +234,15 @@ class MazeEnv5x5(MazeEnv):
 
 class MazeEnvHairpin(MazeEnv):
     def __init__(self):
-        super(MazeEnvHairpin).__init__(maze_file="hairpin_14x14.npy")
+        super(MazeEnvHairpin, self).__init__(maze_file="hairpin_14x14.npy")
 
 class MazeEnvTolmanV0(MazeEnv):
     def __init__(self):
-        super(MazeEnvTolmanV0).__init__(maze_file="tolman_9x9_v0.npy")
+        super(MazeEnvTolmanV0, self).__init__(maze_file="tolman_9x9_v0.npy")
 
 class MazeEnvTolmanV1(MazeEnv):
     def __init__(self):
-        super(MazeEnvTolmanV1).__init__(maze_file="tolman_9x9_v1.npy")
+        super(MazeEnvTolmanV1, self).__init__(maze_file="tolman_9x9_v1.npy")
 
 if __name__ == '__main__':
     # Test it out
