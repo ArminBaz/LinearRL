@@ -3,7 +3,8 @@ This repository is a Python implementation of ["Linear reinforcement learning in
 
 ## Introduction
 The code converts the LinearRL framework introduced by Piray et al. into a Python framework. Additionally, it is converted to be used with OpenAI's Gym reinforcement learning environments. <br> <br>
-Currently, the framework is designed to work with tabular environments.
+Currently, the framework is designed to work with tabular environments. <br> <br>
+**Please Note** although the code structure is made to handle gym-like function calls. This code will not be compatible with any environment. It has been speficially constructed for tabular environments that we have created, see `gym-env/` for more details.
 
 ## Usage
 ### Conda Environment
@@ -25,7 +26,7 @@ To configure the code with your desired parameters you can edit the `config.yml`
 For example, you can change the `ENV` flag with your desired gym environment.
 
 ### Run
-To train the LinearRL model you can run `train.py` which will train a LinearRL agent on the specified gym environment.
+To run the LinearRL model you can run `main.py` which will use LinearRL to solve for the optimal value function and optimal policy on the specified environment.
 ```bash
-python src/train.py
+python src/main.py
 ```
