@@ -21,7 +21,7 @@ pip install -e gym-env
 ```
 
 ### Configuration
-To configure the code with your desired parameters you can edit the `config.yaml` file. <br>
+To configure the code with your desired parameters you can edit the `config.yml` file. <br>
 For example, you can change the `ENV` flag with your desired gym environment.
 
 ### Run
