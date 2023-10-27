@@ -4,6 +4,7 @@ import numpy as np
 import gymnasium as gym
 
 import gym_env
+import config
 
 
 available_mazes = ["simple-5x5", "hairpin-14x14", "tolman-9x9-nb", "tolman-9x9-b"]
@@ -17,28 +18,49 @@ def load_maze(maze_name):
 
     return gym.make(maze_name)
 
-def row_col_to_index(row, col, len):
+def get_blocked_states(maze):
     """
-    Converts (row,col) to an index in array
+    Returns a list of all states that are blocked, represented in the environment with a "1"
     """
-    return row*len + col
+    blocked_states = []
 
-def index_to_row_col(index, len):
-    """
-    Converts index back to (row,col)
-    """
-    return (index // len, index % len)
+    for i in range(maze.shape[0]):
+        for j in range(maze.shape[1]):
+            if maze[i,j] == "1":
+                blocked_states.append((i,j))
+    
+    return blocked_states
 
-def get_transition_matrix(env):
+def create_transition_matrix_mapping(maze):
+    """
+    Maps (row,col) to an index, taking into account that some states are blocked
+    """
+    blocked_states = get_blocked_states(maze)
+    n = len(maze)  # Size of the maze (N)
+
+    # Create a mapping from maze state indices to transition matrix indices
+    mapping = {}
+    matrix_idx = 0
+
+    for i in range(n):
+        for j in range(n):
+            if (i, j) not in blocked_states:
+                mapping[(i, j)] = matrix_idx
+                matrix_idx += 1
+
+    return mapping
+
+def get_transition_matrix(env, mapping):
     """
     Returns the transition matrix, under a uniform policy
     """
+    # mapping, m = create_transition_matrix_mapping(maze)
+    # reverse_mapping = {index: (i, j) for (i, j), index in mapping.items()}
+
     actions = np.arange(env.action_space.n, dtype=int)
     maze = env.unwrapped.maze
-    size = maze.size
 
-    # Get the transition matrix T N^2 x N^2
-    T = np.zeros(shape=(size, size))
+    T = np.zeros(shape=(len(mapping), len(mapping)))
 
     # loop through the maze
     for row in range(maze.shape[0]):
@@ -46,19 +68,111 @@ def get_transition_matrix(env):
             # if we hit a barrier
             if maze[row,col] == '1':
                 continue
+                
             # at each location, we want to store the location, keep track of which new states we transition into, and how many states we transition into
             loc = np.array((row,col))
+            idx_cur = mapping[row, col]
+
+            # if we hit a goal
+            if maze[row, col] == 'G':
+                T[idx_cur, idx_cur] = 1
+                continue
+
             new_states = []
             for action in actions:     # loop through actions
                 env.unwrapped.agent_loc = loc                  # set new agent location based on where we are in maze
-                obs, _, _, _, _ = env.step(action)     # take action
+                obs, reward, term, _, _ = env.step(action)     # take action
 
                 # if dont move because we hit a boundary, do nothing
                 if (obs['agent'] == loc).all():
                     continue
                 new_states.append(obs['agent'])
             
-            idx_cur = row_col_to_index(row, col, maze.shape[0])
             for new_state in new_states:
-                idx_new = row_col_to_index(new_state[0], new_state[1], maze.shape[0])
+                idx_new =mapping[new_state[0], new_state[1]]
                 T[idx_cur, idx_new] = 1/len(new_states)
+    
+    # Make sure all the rows sum to 1
+    assert np.all(np.isclose(np.sum(T, axis=1), 1.0)), "Not all rows sum to one."
+
+    return T
+
+def get_expv(T, terminals):
+    """
+    Uses equations from the paper to calculate exp(v*)
+    """
+    _lambda = config.LAMBDA
+    terminals = np.diag(T) == 1     # find terminal states
+
+    c = np.full(len(T), 1)
+    c[terminals] = 0
+    r = -c
+
+    L = np.diag(np.exp(c / _lambda)) - T
+
+    # Remove rows and columns corresponding to terminals
+    L = np.delete(L, terminals, axis=0)
+    L = np.delete(L, terminals, axis=1)
+
+    # Calculate the inverse of L
+    M = np.linalg.inv(L)
+
+    # Calculate P = T_{NT}
+    P = T[~terminals][:,terminals]
+
+    # Calculate expr
+    expr = np.exp(r[terminals] / _lambda)
+
+    # Initialize expv as zeros
+    expv = np.zeros(r.shape)
+
+    # Calculate expv for non-terminal states
+    expv_N = M @ P @ expr
+    expv[~terminals] = expv_N
+
+    # Calculate expv for terminal states
+    expv[terminals] = np.exp(r[terminals] / _lambda)
+
+    return expv
+
+def maze_value(maze, expv, mapping):
+    """
+    Uses exp(v*) and the mapping to create a value function of the optimal value for each state of the maze.
+    Replaces blocked locations with negative infinity.
+    """
+    v_maze = np.zeros_like(maze)
+    for row in range(v_maze.shape[0]):
+        for col in range(v_maze.shape[1]):
+            if maze[row, col] == "1":
+                v_maze[row,col] = np.NINF
+                continue
+            v_maze[row,col] = round(np.log(expv[mapping[(row,col)]]), 2)
+    
+    return v_maze
+
+def split_transition_matrix(T, mapping, target_locs):
+    """
+    Splits our transition matrix into T_nn and T_nt
+    T_nn -> transition probability between non-terminal states 
+    T_nt -> transition probability from non-terminal to terminal states
+    """
+    # Make T_nn by excluding the rows and columns associated with the terminal state (also works if we have multiple)
+    terminal_indices = [mapping[loc[0], loc[1]] for loc in target_locs]
+
+    T_nn = T.copy()
+
+    for index in terminal_indices:
+        T_nn = np.delete(T_nn, index, axis=0)
+        T_nn = np.delete(T_nn, index, axis=1)
+
+    # Make T_nt by selecting only the rows corresponding to the terminal states
+    all_indices = set(range(T.shape[0]-1))
+    nonterminal_indices = all_indices - set(terminal_indices)
+
+    T_nt = np.zeros((len(T)-1, len(terminal_indices)))
+
+    for i, index_term in enumerate(terminal_indices):
+        for index in nonterminal_indices:
+            T_nt[index, i] = T[index, index_term]
+    
+    return T_nn, T_nt
