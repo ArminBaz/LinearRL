@@ -8,7 +8,7 @@ Currently, the framework is designed to work with tabular environments. <br> <br
 
 ## Usage
 ### Conda Environment
-I reccomend creating a conda environment for usage with this repo. Espcially because we will installing some custom built environments. You can install the conda environment from the yml file I have provided.
+I recommend creating a conda environment for usage with this repo. Espcially because we will installing some custom built environments. You can install the conda environment from the yml file I have provided.
 ```bash
 conda env create -f env.yml
 ```
