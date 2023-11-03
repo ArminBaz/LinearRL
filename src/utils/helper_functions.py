@@ -7,7 +7,8 @@ import gym_env
 import config
 
 
-available_mazes = ["simple-5x5", "hairpin-14x14", "tolman-9x9-nb", "tolman-9x9-b"]
+available_mazes = ["simple-5x5", "simple-15x15", "hairpin-14x14", "tolman-9x9-nb", "tolman-9x9-b"]
+available_agents = ["linear-rl", "z-learning"]
 
 def load_maze(maze_name):
     """
