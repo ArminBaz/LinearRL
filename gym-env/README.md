@@ -15,6 +15,12 @@ Following up on this point, if you would like to use the custom environments the
 pip install -e gym-env
 ```
 
+## Adding your own environment
+If you would like to add your own environment, make sure it fits within the way I have defined the environments. For example, the maze environment class expects a .npy file which contains 0s to indicate open states, 1s to indicate blocked state, 'S' to indicate the starting state, and 'G' to indicate any terminal state. <br> <br>
+
+After you have added your own environment file, make sure you construct a class instantiaion of it inside of `gym_env/envs/maze_env.py`, import the class in `gym_env/envs/__init__.py`, and register it inside of `gym_env/__intit__.py`. <br> <br>
+
+Ater you've done all this, you need to remake the pip installation of our custom gym env by running the command outlined in the previous section.
 
 ## From Paper
 ### 10x10 Maze

@@ -1,1 +1,1 @@
-from gym_env.envs.maze_env import MazeEnv, MazeEnv5x5, MazeEnvHairpin, MazeEnvTolmanNB, MazeEnvTolmanB
+from gym_env.envs.maze_env import MazeEnv, MazeEnv5x5, MazeEnvHairpin, MazeEnvTolmanNB, MazeEnvTolmanB, MazeEnv15x15

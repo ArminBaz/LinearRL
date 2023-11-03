@@ -27,4 +27,9 @@ register(
     max_episode_steps=2000,
 )
 
-# 10x10
+# 15x15
+register(
+    id="simple-15x15",
+    entry_point="gym_env.envs:MazeEnv15x15",
+    max_episode_steps=2000,
+)

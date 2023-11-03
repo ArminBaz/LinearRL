@@ -244,6 +244,10 @@ class MazeEnvTolmanB(MazeEnv):
     def __init__(self):
         super(MazeEnvTolmanB, self).__init__(maze_file="tolman_9x9_v1.npy")
 
+class MazeEnv15x15(MazeEnv):
+    def __init__(self):
+        super(MazeEnv15x15, self).__init__(maze_file="maze_15x15.npy")
+
 if __name__ == '__main__':
     # Test it out
     env = MazeEnv(maze_file="maze2d_5x5.npy")
