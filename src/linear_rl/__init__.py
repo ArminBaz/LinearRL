@@ -1,1 +1,1 @@
-from .linear_rl import LinearRL
+from .linear_rl import LinearRL, LinearRLIterative

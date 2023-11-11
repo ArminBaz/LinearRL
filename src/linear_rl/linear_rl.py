@@ -8,6 +8,9 @@ import gym_env
 from utils import load_maze, create_transition_matrix_mapping, get_transition_matrix
 
 class LinearRL():
+    """
+    Matrix version of Linear RL
+    """
     def __init__(self, ENV_NAME, _lambda):
         self._lambda = _lambda
         # load environment and reset it
@@ -78,6 +81,20 @@ class LinearRL():
         maze_values = self.maze_value(expv)
 
         return expv, maze_values
+
+class LinearRLIterative():
+    """
+    Iterative version of Linear RL
+    """
+    def __init__(self, env_name, _lambda, epsilon, max_iterations):
+        self._lambda = _lambda
+        self.env = load_maze(env_name)
+        self.env.reset()
+    
+    def run(self):
+        """
+        Runs 
+        """
 
 # Test
 if __name__ == '__main__':

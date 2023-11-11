@@ -2,9 +2,10 @@ import os
 import numpy as np
 
 import config
-from linear_rl import LinearRL
+from linear_rl import LinearRL, LinearRLIterative
+from deep_linear_rl import DeepLinearRL
 
-available_agents = ["linear-rl", "z-learning"]
+available_agents = ["linear-rl", "iterative-linear-rl", "deep-linear-rl"]
 
 def get_agent(agent_name):
     """
@@ -15,8 +16,10 @@ def get_agent(agent_name):
     
     if agent_name == "linear-rl":
         return LinearRL(config.ENV_NAME, config.LAMBDA)
-    # elif agent_name == "z-learning":
-    #     return ZLearning(config.ENV_NAME, config.LAMBDA)
+    # elif agent_name == "iterative-linear-rl":
+    #     return LinearRLIterative(config.ENV_NAME, config.LAMBDA, config.EPSILON, config.MAX_ITERATIONS)
+    # elif agent_name == "deep-linear-rl":
+    #     return DeepLinearRL(config.ENV_NAME, config.LAMBDA, config.EPSILON, config.MAX_ITERATIONS)
 
 def main():
     agent = LinearRL(config.ENV_NAME, config.LAMBDA)
