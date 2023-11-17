@@ -6,6 +6,8 @@ __pycache__/
 .ipynb_checkpoints/
 .vscode/
 
+notebooks/
+
 gym-env/build/
 gym-env/dist/
 gym-env/gym_env.egg-info/
