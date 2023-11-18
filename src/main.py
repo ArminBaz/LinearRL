@@ -4,8 +4,9 @@ import numpy as np
 import config
 from linear_rl import LinearRL, LinearRLIterative
 from deep_linear_rl import DeepLinearRL
+from dqn import DQN
 
-available_agents = ["linear-rl", "iterative-linear-rl", "deep-linear-rl"]
+available_agents = ["linear-rl", "iterative-linear-rl", "deep-linear-rl", "dqn"]
 
 def get_agent(agent_name):
     """
@@ -20,6 +21,8 @@ def get_agent(agent_name):
     #     return LinearRLIterative(config.ENV_NAME, config.LAMBDA, config.EPSILON, config.MAX_ITERATIONS)
     # elif agent_name == "deep-linear-rl":
     #     return DeepLinearRL(config.ENV_NAME, config.LAMBDA, config.EPSILON, config.MAX_ITERATIONS)
+    # elif agent_name == "dqn":
+    #     return DQN(config.ENV_NAME, config.LAMBDA, config.MAX_ITERATIONS)
 
 def main():
     agent = LinearRL(config.ENV_NAME, config.LAMBDA)
