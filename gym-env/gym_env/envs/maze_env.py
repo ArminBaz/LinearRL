@@ -92,6 +92,48 @@ class MazeEnv(gym.Env):
 
         return observation, reward, terminated, False, info
     
+    def random_action(self):
+        """
+        Returns a random action from the environment
+        """
+        available_actions = []
+        for action in np.arange(self.action_space.n, dtype=int):
+            direction = self._action_to_direction[action]
+            new_loc = np.copy(self.agent_loc)
+            new_loc += direction
+            if self._is_valid_position(new_loc):
+                available_actions.append(action)
+        
+        return np.random.choice(available_actions)
+    
+    def get_available_actions(self, state):
+        """
+        Returns available actions at specified state
+        """
+        available_actions = []
+        for action in np.arange(self.action_space.n, dtype=int):
+            direction = self._action_to_direction[action]
+            new_loc = np.copy(state)
+            new_loc += direction
+            if self._is_valid_position(new_loc):
+                available_actions.append(action)
+        return available_actions
+    
+    def get_successor_states(self, state):
+        """
+        Returns a list of successor states and if they are terminal states
+        """
+        next_states = []
+        for action in np.arange(self.action_space.n, dtype=int):
+            direction = self._action_to_direction[action]
+            new_loc = np.copy(state)
+            new_loc += direction
+            if self._is_valid_position(new_loc):
+                terminated = np.array_equal(new_loc, self.target_loc)
+                next_states.append((new_loc, terminated))
+        
+        return next_states
+    
     def _read_maze_file(self, maze_file):
         dir_path = os.path.dirname(os.path.abspath(__file__))
         rel_path = os.path.join(dir_path, "maze_files", maze_file)
@@ -133,7 +175,16 @@ class MazeEnv(gym.Env):
     def render(self):
         if self.render_mode == "rgb_array":
             return self._render_frame()
+        elif self.render_mode == "pyplot":
+            return self._render_pyplot()
     
+    def _render_pyplot(self):
+        """
+        Renders current frame using pyplot
+        """
+        
+        raise NotImplementedError
+
     def _render_frame(self):
         """
         Renders a frame in pygame
@@ -248,9 +299,25 @@ class MazeEnv15x15(MazeEnv):
     def __init__(self):
         super(MazeEnv15x15, self).__init__(maze_file="maze_15x15.npy")
 
+class MazeEnvTolmanLatent(MazeEnv):
+    def __init__(self):
+        super(MazeEnvTolmanLatent, self).__init__(maze_file="tolman_10x10_latent.npy")
+
+class MazeEnvTolmanLatentNewGoal(MazeEnv):
+    def __init__(self):
+        super(MazeEnvTolmanLatentNewGoal, self).__init__(maze_file="tolman_10x10_latent_new_goal.npy")
+
+class MazeEnv4RoomTR(MazeEnv):
+    def __init__(self):
+        super(MazeEnv4RoomTR, self).__init__(maze_file="four_room_tr.npy")
+
+class MazeEnv4RoomBR(MazeEnv):
+    def __init__(self):
+        super(MazeEnv4RoomBR, self).__init__(maze_file="four_room_br.npy")
+
 if __name__ == '__main__':
     # Test it out
-    env = MazeEnv(maze_file="maze2d_5x5.npy")
+    env = MazeEnv(maze_file="tolman_10x10_latent.npy")
     # env = MazeEnv(maze_file="hairpin_14x14.npy")
     print(f"env: {env}")
     print(f"start loc: {env.start_loc}, target loc: {env.target_loc}")

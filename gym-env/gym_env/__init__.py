@@ -27,6 +27,33 @@ register(
     max_episode_steps=2000,
 )
 
+# Tolman latent task
+register(
+    id="tolman-10x10-latent",
+    entry_point="gym_env.envs:MazeEnvTolmanLatent",
+    max_episode_steps=2000,
+)
+
+# Tolman latent task
+register(
+    id="tolman-10x10-latent-new-goal",
+    entry_point="gym_env.envs:MazeEnvTolmanLatentNewGoal",
+    max_episode_steps=2000,
+)
+
+# Four room task
+register(
+    id="four_room_tr",
+    entry_point="gym_env.envs:MazeEnv4RoomTR",
+    max_episode_steps=2000,
+)
+
+register(
+    id="four_room_br",
+    entry_point="gym_env.envs:MazeEnv4RoomBR",
+    max_episode_steps=2000,
+)
+
 # 15x15
 register(
     id="simple-15x15",

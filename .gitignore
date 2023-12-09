@@ -11,3 +11,9 @@ notebooks/
 gym-env/build/
 gym-env/dist/
 gym-env/gym_env.egg-info/
+
+src/deep_linear_rl
+stc/dqn
+
+utils/buffer.py
+utils/wrappers.py
