@@ -6,15 +6,6 @@ __pycache__/
 .ipynb_checkpoints/
 .vscode/
 
-notebooks/
-experiment/
-
 gym-env/build/
 gym-env/dist/
 gym-env/gym_env.egg-info/
-
-src/deep_linear_rl
-stc/dqn
-
-src/utils/buffer.py
-src/utils/wrappers.py

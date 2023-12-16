@@ -14,8 +14,6 @@ conda env create -f env.yml
 ```
 
 ### Environments
-I made custom gym environments to replicate those typically found in cognitive neuroscience literature. Consequently, a lot of the results in the paper also come from such environments. <br> <br>
-
 Because we are using custom gym environments, you need to install them locally in order for gymansium to recognize them when we are constructing our environment variables. To install the environemnts, just run:
 ```bash
 pip install -e gym-env
@@ -26,7 +24,8 @@ To configure the code with your desired parameters you can edit the `config.yml`
 For example, you can change the `ENV` flag with your desired gym environment.
 
 ### Run
-To run the LinearRL model you can run `main.py` which will use LinearRL to solve for the optimal value function and optimal policy on the specified environment.
-```bash
-python src/main.py
-```
+Examples of using the model can be found in the notebooks. There are two notebooks, one containing a version of the Tolman detour task, the other containing a reward revaluation task.
+
+### Replanning
+For the replanning tasks, you can find examples in the two notebooks `lrl-reward.ipynb` and `lrl-detour.ipynb`. The first considers the Tolman latent learning problem where the goal state is moved after learning. 
+The second considers the problem adding a barrier to the environment after learning.
