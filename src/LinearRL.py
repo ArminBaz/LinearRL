@@ -90,10 +90,6 @@ class LinearRL:
             direction = self.env.unwrapped._action_to_direction[action]
             new_state = state + direction
 
-            # Need this to make it work for now
-            if np.array_equal(new_state, self.target_loc):
-                return action
-
             if self.maze[new_state[0], new_state[1]] == "1":
                 continue
             action_values[action] = round(np.log(self.Z[self.mapping[(new_state[0],new_state[1])]]), 2)
