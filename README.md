@@ -2,8 +2,8 @@
 This repository is a Python implementation of ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3) by Piray et al.
 
 ## Introduction
-The code converts the LinearRL framework introduced by Piray et al. into a Python framework. Additionally, it is converted to be used with environments that have a similar structure to OpenAI's Gym reinforcement learning environments. <br> <br>
-**Please Note** although the code structure is made to handle gym-like function calls. This code will not be compatible with any environment. It has been speficially constructed for tabular environments that we have created, see `gym-env/` for more details.
+The code converts the LinearRL framework introduced by Piray et al. into Python. Additionally, it is converted to be used with environments that have a similar structure to OpenAI's Gym reinforcement learning environments. <br> <br>
+**Please Note** although the code structure is made to handle gym-like function calls. This code will not be compatible with any environment. It has been specifically designed for the tabular environments that I have created, see `gym-env/` for more details.
 
 ## Conda & Gym Environments
 ### Conda Environment
