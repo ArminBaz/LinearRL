@@ -78,7 +78,7 @@ class LinearRL:
     
     def update_V(self):
         self.Z[~self.terminals] = self.DR[~self.terminals][:,~self.terminals] @ self.P @ self.expr
-        self.Z[self.terminals] = np.exp(self.r[self.terminals] / self._lambda)
+        self.Z[self.terminals] = self.expr
         self.V = np.round(np.log(self.Z), 2)
     
     def select_action(self, state):
