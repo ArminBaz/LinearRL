@@ -6,48 +6,54 @@ import random
 
 
 def create_transition_matrix_mapping(maze):
-        """
-        Creates a mapping from maze state indices to transition matrix indices
-        """
-        n = len(maze)  # Size of the maze (N)
+    """
+    Creates a mapping from maze state indices to transition matrix indices
+    """
+    n = len(maze)  # Size of the maze (N)
 
-        mapping = {}
-        matrix_idx = 0
+    mapping = {}
+    matrix_idx = 0
 
-        for i in range(n):
-            for j in range(n):
-                mapping[(i,j)] = matrix_idx
-                matrix_idx += 1
+    for i in range(n):
+        for j in range(n):
+            mapping[(i,j)] = matrix_idx
+            matrix_idx += 1
 
-        return mapping
+    return mapping
 
 def get_transition_matrix(env, size, mapping):
-        maze = env.unwrapped.maze
+    """
+    Creates a transition matrix assuming a uniform random default policy
+    """
+    maze = env.unwrapped.maze
 
-        T = np.zeros(shape=(size, size))
-        # loop through the maze
-        for row in range(maze.shape[0]):
-            for col in range(maze.shape[1]):            
-                # if we hit a barrier
-                if maze[row,col] == '1':
-                    continue
+    T = np.zeros(shape=(size, size))
+    # loop through the maze
+    for row in range(maze.shape[0]):
+        for col in range(maze.shape[1]):            
+            # if we hit a barrier
+            if maze[row,col] == '1':
+                continue
 
-                idx_cur = mapping[row, col]
+            idx_cur = mapping[row, col]
 
-                # check if current state is terminal
-                if maze[row,col] == 'G':
-                    T[idx_cur, idx_cur] = 1
-                    continue
+            # check if current state is terminal
+            if maze[row,col] == 'G':
+                T[idx_cur, idx_cur] = 1
+                continue
 
-                state = (row,col)
-                successor_states = env.unwrapped.get_successor_states(state)
-                for successor_state in successor_states:
-                    idx_new = mapping[successor_state[0][0], successor_state[0][1]]
-                    T[idx_cur, idx_new] = 1/len(successor_states)
-        
-        return T
+            state = (row,col)
+            successor_states = env.unwrapped.get_successor_states(state)
+            for successor_state in successor_states:
+                idx_new = mapping[successor_state[0][0], successor_state[0][1]]
+                T[idx_cur, idx_new] = 1/len(successor_states)
+    
+    return T
 
 def get_map(agent):
+    """
+    Helper function to convert the maze map values to int
+    """
     # Replace 'S' and 'G' with 0
     m = np.where(np.isin(agent.maze, ['S', 'G']), '0', agent.maze)
 
@@ -56,7 +62,10 @@ def get_map(agent):
     
     return m
 
-def render_maze(agent, state, ax=None):    
+def render_maze(agent, state, ax=None):
+    """
+    Render the maze
+    """   
     if ax is None:
         fig, ax = plt.subplots()
     m = get_map(agent)
@@ -74,6 +83,9 @@ def render_maze(agent, state, ax=None):
     ax.set_axis_off()
 
 def render_DR(agent, state, ax=None):
+    """
+    Renders the agent's default representation at the current state
+    """
     state_idx = agent.mapping[(state[0], state[1])]
     ax.imshow(agent.DR[state_idx].reshape(agent.height, agent.width), 
               origin='upper', cmap='plasma')
@@ -81,6 +93,9 @@ def render_DR(agent, state, ax=None):
     ax.set_axis_off()
 
 def render_V(agent, ax):
+    """
+    Renders the value of each state
+    """
     min_value = np.min(agent.V[~np.isinf(agent.V)])
     max_value = np.max(agent.V)
 
@@ -94,6 +109,9 @@ def render_V(agent, ax):
     ax.set_axis_off()
 
 def make_plots(agent, state=None):
+    """
+    Plots the maze, DR, and value side by side by side
+    """
     # Adjust DR at terminal state
     idx = agent.mapping[agent.target_loc[0], agent.target_loc[1]]
     agent.DR[idx, :] = 0
@@ -110,30 +128,11 @@ def make_plots(agent, state=None):
     
     plt.show()
 
-def record_trajectory(agent, traj):
-    m = get_map(agent)
-    
-    # Display maze
-    cmap = plt.cm.Greys_r
-    cmap.set_bad('black', 1.0)
-    plt.imshow(m, origin='upper', cmap=cmap)
-    # Display agent
-    agent_loc = patches.Circle((agent.start_loc[1],agent.start_loc[0]), radius=0.4, fill=True, color='blue')
-    plt.add_patch(agent_loc)
-    # Display Reward
-    reward = patches.Circle((agent.target_loc[1],agent.target_loc[0]), radius=0.4, fill=True, color='green')
-    plt.add_patch(reward)
-
-    # loop through trajectory and add arrows
-    for loc in traj:
-        arrow = patches.Arrow((loc[1],loc[0]), fill=True, color='red')
-        plt.add_patch(arrow)
-
-    plt.set_title('Map')
-    plt.set_axis_off()
-
 def record_trials(agent, title="recorded_trials", n_trial_per_loc=1,
                     start_locs=None, max_steps=100):
+    """
+    Records the agent's trajectory from one or multiple starting points and saves it as a mp4 file
+    """
     metadata = dict(title=title, artist='JG')
     writer = manimation.FFMpegFileWriter(fps=10, metadata=metadata)
     fig, axs = plt.subplots(1, 3, figsize=(7, 3))
@@ -175,6 +174,9 @@ def record_trials(agent, title="recorded_trials", n_trial_per_loc=1,
                         ax.clear()
 
 def record_trajectory(agent, traj):
+    """
+    Takes the given trajectory and plots it
+    """
     fig, ax = plt.subplots()
 
     m = get_map(agent)
@@ -202,7 +204,7 @@ def record_trajectory(agent, traj):
 
 def test_agent(agent, state=None):
     """
-    Function to test the agent
+    Function to test the agent, agent starts at start_loc and acts greedily
     """
     traj = []
 
