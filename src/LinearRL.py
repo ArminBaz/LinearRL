@@ -33,50 +33,10 @@ class LinearRL:
         self.DR = np.eye(self.size)
         self.Z = np.zeros(self.size)
     
-    def create_transition_matrix_mapping(self):
-        """
-        Creates a mapping from maze state indices to transition matrix indices
-        """
-        n = len(self.maze)  # Size of the maze (N)
-
-        mapping = {}
-        matrix_idx = 0
-
-        for i in range(n):
-            for j in range(n):
-                mapping[(i,j)] = matrix_idx
-                matrix_idx += 1
-
-        return mapping
-    
-    def get_transition_matrix(self, size, mapping):
-        """
-        Creates a transition matrix assuming a uniform random default policy
-        """
-        T = np.zeros(shape=(size, size))
-        # loop through the maze
-        for row in range(self.maze.shape[0]):
-            for col in range(self.maze.shape[1]):            
-                # if we hit a barrier
-                if self.maze[row,col] == '1':
-                    continue
-
-                idx_cur = mapping[row, col]
-
-                # check if current state is terminal
-                if self.maze[row,col] == 'G':
-                    T[idx_cur, idx_cur] = 1
-                    continue
-
-                state = (row,col)
-                successor_states = self.env.unwrapped.get_successor_states(state)
-                for successor_state in successor_states:
-                    idx_new = mapping[successor_state[0][0], successor_state[0][1]]
-                    T[idx_cur, idx_new] = 1/len(successor_states)
-        
-        return T
-    
     def update_V(self):
+        """
+        Updates the value of our states according to equations from paper
+        """
         self.Z[~self.terminals] = self.DR[~self.terminals][:,~self.terminals] @ self.P @ self.expr
         self.Z[self.terminals] = self.expr
         self.V = np.round(np.log(self.Z), 2)
