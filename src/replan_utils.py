@@ -11,7 +11,8 @@ import numpy as np
 
 def add_barrier(agent, T):
     """
-
+    The transition structure of the environment has changed because we have included a barrier. We perform a low rank update to the old DR
+    based off the states whose transition structure has changed (delta_locs).
 
     Args:
     agent (LinearRL class): The LinearRL agent 
@@ -44,7 +45,8 @@ def add_barrier(agent, T):
 
 def change_goal(linear_rl, new_env):
     """
-
+    New environment is the same as the old one, except we update the value of one of the terminal (goal) states. We can use the old precomputed DR 
+    to get a new DR and include the new information as well.
 
     Args:
     linear_rl (LinearRL class): The LinearRL agent 
