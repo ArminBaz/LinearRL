@@ -4,6 +4,7 @@ import gymnasium as gym
 import gym_env
 
 from utils import create_transition_matrix_mapping, get_transition_matrix
+from replan_utils import add_barrier, change_goal, new_goal
 
 
 class LinearRL:
@@ -44,6 +45,11 @@ class LinearRL:
     def select_action(self, state):
         """
         Select action greedily according to Z-values
+
+        Args:
+            state (tuple): Current state
+        Output:
+            action (int): Greedy action 
         """
         action_values = np.full(self.env.action_space.n, -np.inf)
         for action in self.env.unwrapped.get_available_actions(state):
@@ -67,12 +73,16 @@ class LinearRL:
         # Update the value
         self.update_V()
 
-    def replan(self, new_env, loc):
+    def replan(self, new_env, experiment, loc=None):
         """
         Function to replan, using equations from paper.
 
         Note, this probably isn't the best way to do this. In the future I might make the environment directly modifiable so I don't have to load a whole new
         environment in and specificy the changed location, but this is the way I'm doing it for now.
+
+        Args:
+            new_env (maze): The updated environment
+            experiment (string): The experiment we are running
         """
         # Load the new environment
         new_env = gym.make(new_env)
@@ -81,43 +91,27 @@ class LinearRL:
         new_mapping = create_transition_matrix_mapping(new_env.unwrapped.maze)
         T = get_transition_matrix(new_env, new_env.unwrapped.maze.size, new_mapping)
 
-        D0 = self.DR
-        L0 = np.diag(np.exp(-self.r)) - self.T
-        L = np.diag(np.exp(-self.r)) - T
+        # Check if transition structure changes:
+        if experiment == "add_barrier":
+            print("Replanning around new barrier...")
+            # Border transition using eqn. 17
+            add_barrier(self, T)
 
-        idx = self.mapping[loc]
+        # Check if terminal states are updated:
+        elif experiment == "update_goal":
+            print("Replanning with new terminal state values...")
+            raise NotImplementedError
 
-        d = L[idx, :] - L0[idx, :]
-        m0 = D0[:,idx]
-
-        # Convert d to a row vector of size (1, m)
-        d = d.reshape(1, -1)
-
-        # Convert m0 to a column vector of size (m, 1)
-        m0 = m0.reshape(-1, 1)
-
-        # Get the amount of change to the DR
-        alpha = (np.dot(m0,d)) / (1 + (np.dot(d,m0)))
-        change = np.dot(alpha,D0)
-
-        # Apply change to DR
-        D = np.copy(D0)
-        D -= change
-
-        # Set agent's DR to new DR
-        self.DR = D
-
-        # Update terminals
-        self.terminals = np.diag(T) == 1
-        # Update P
-        self.P = T[~self.terminals][:,self.terminals]
-        # Update reward
-        self.r = np.full(len(T), -0.1)     # our reward at each non-terminal state to be -1
-        self.r[self.terminals] = 1         # reward at terminal state is 0
-        self.expr = np.exp(self.r[self.terminals] / self._lambda)
-
-        # Update Z-values
+        # Check if we are planning towards a new goal:
+        elif experiment == "new_goal":
+            print("Replanning towards new goal...")
+            new_goal(self, T, loc)
+        
+        else:
+            raise ValueError("Invalid experiment")
+        # Update Values
         self.update_V()
 
-        # Se new environment
+        # Set new environment
         self.env = new_env
+        self.maze = self.env.unwrapped.maze

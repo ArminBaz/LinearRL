@@ -1,3 +1,8 @@
+"""
+Author: Armin Bazarjani
+
+This file contains misc. util functions, mainly for testing the agent, recording trials, and outputing results
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import patches
@@ -8,6 +13,11 @@ import random
 def create_transition_matrix_mapping(maze):
     """
     Creates a mapping from maze state indices to transition matrix indices
+
+    Args:
+        maze (array): Maze we want to get DR for
+    Output:
+        mapping (dict): Maze specific mapping from state -> idx
     """
     n = len(maze)  # Size of the maze (N)
 
@@ -24,6 +34,13 @@ def create_transition_matrix_mapping(maze):
 def get_transition_matrix(env, size, mapping):
     """
     Creates a transition matrix assuming a uniform random default policy
+
+    Args:
+        env (gymnasium env): The current environment to learn the DR on
+        size (int): The size of the environment (assumed square)
+        mapping (dict): Dictionary that mapes states (tuple) -> idx (int)
+    Output:
+        T (array): Transition matrix assuming uniform transitions
     """
     maze = env.unwrapped.maze
 
@@ -53,6 +70,11 @@ def get_transition_matrix(env, size, mapping):
 def get_map(agent):
     """
     Helper function to convert the maze map values to int
+
+    Args:
+        agent (LinearRL class): The agent
+    Output:
+        m (array): Map of environment converted to int
     """
     # Replace 'S' and 'G' with 0
     m = np.where(np.isin(agent.maze, ['S', 'G']), '0', agent.maze)
