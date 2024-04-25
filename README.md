@@ -1,9 +1,9 @@
 # LinearRL - Python Implementation
-This repository is a Python implementation of ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3) by Piray et al. <br> <br>
+This repository is a Python implementation of ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3) by Piray et al. <br>
 
-**Another Note**: Although I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/). <br>
+The detour task is the only 1-1 task as presented in the paper, for the other two tasks I used inspiration from the great paper ["Predictive representations can link model- based reinforcement learning to model-free mechanisms"](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005768) by Russek et al. Even though the latent learning and change in goal tasks are not presented like this in the original LinearRL paper, the equations I used are from the original paper and still hold up. <br> <br>
 
-The detour task is the only 1-1 task as presented in the paper, for the other two tasks I used inspiration from the great paper ["Predictive representations can link model- based reinforcement learning to model-free mechanisms"](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005768) by Russek et al. Even though the latent learning and change in goal tasks are not presented like this in the original LinearRL paper, the equations I used are from the original paper and still hold up.
+**Author Note**: Although I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/). <br>
 
 ## Introduction
 The code converts the LinearRL framework introduced by Piray et al. into Python. Additionally, it is converted to be used with environments that have a similar structure to OpenAI's Gym reinforcement learning environments. <br> <br>
