@@ -1,7 +1,9 @@
 # LinearRL - Python Implementation
 This repository is a Python implementation of ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3) by Piray et al. <br> <br>
 
-**Another Note**: Althought I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/).
+**Another Note**: Although I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/). <br> <br>
+
+Please note that the detour task is the only 1-1 task as presented in the paper, for the other two tasks, I used inspiration from the great paper by Russek et al. ["Predictive representations can link model- based reinforcement learning to model-free mechanisms"](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005768). Even though the latent learning and change in goal tasks are not presented like this in the original LinearRL paper, the equations I used are from the original paper and still hold up.
 
 ## Introduction
 The code converts the LinearRL framework introduced by Piray et al. into Python. Additionally, it is converted to be used with environments that have a similar structure to OpenAI's Gym reinforcement learning environments. <br> <br>
@@ -25,4 +27,5 @@ pip install -e gym-env
 Examples of using the model can be found in the notebooks. There are two notebooks, one containing a version of the Tolman detour task, the other containing a reward revaluation task.
 
 The notebook with reward revaluation planning can be found in `src/linear-rl-reward.ipynb`. <br>
-The notebook with the Tolman detour planning task can be found in `src/linear-rl-det.ipynb`.
+The notebook with the Tolman detour planning task can be found in `src/linear-rl-det.ipynb`. <br>
+The notebook with updating the reward of a terminal state can be found in `src/linear-rl-change-goal.ipynb`.
