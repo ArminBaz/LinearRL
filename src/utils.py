@@ -98,8 +98,9 @@ def render_maze(agent, state, ax=None):
     agent_loc = patches.Circle((state[1],state[0]), radius=0.4, fill=True, color='white')
     ax.add_patch(agent_loc)
     # Display Reward
-    reward = patches.Circle((agent.target_loc[1],agent.target_loc[0]), radius=0.4, fill=True, color='green')
-    ax.add_patch(reward)
+    for target_loc in agent.target_locs:
+        reward = patches.Circle((target_loc[1], target_loc[0]), radius=0.4, fill=True, color='green')
+        ax.add_patch(reward)
 
     ax.set_title('Map')
     ax.set_axis_off()
@@ -134,10 +135,11 @@ def make_plots(agent, state=None):
     """
     Plots the maze, DR, and value side by side by side
     """
-    # Adjust DR at terminal state
-    idx = agent.mapping[agent.target_loc[0], agent.target_loc[1]]
-    agent.DR[idx, :] = 0
-    agent.DR[idx, idx] = 1
+    # Adjust DR at terminal states
+    for target_loc in agent.target_locs:
+        idx = agent.mapping[target_loc[0], target_loc[1]]
+        agent.DR[idx, :] = 0
+        agent.DR[idx, idx] = 1
 
     if state is None:
         state = agent.start_loc
@@ -211,8 +213,9 @@ def record_trajectory(agent, traj):
     agent_loc = patches.Circle((agent.start_loc[1],agent.start_loc[0]), alpha=0.7, radius=0.4, fill=True, color='blue')
     ax.add_patch(agent_loc)
     # Display Reward
-    reward = patches.Circle((agent.target_loc[1],agent.target_loc[0]), alpha=0.7, radius=0.4, fill=True, color='green')
-    ax.add_patch(reward)
+    for target_loc in agent.target_locs:
+        reward = patches.Circle((target_loc[1], target_loc[0]), alpha=0.7, radius=0.4, fill=True, color='green')
+        ax.add_patch(reward)
 
     # loop through trajectory and add arrows
     for i in range(0,len(traj)-1):

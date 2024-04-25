@@ -43,16 +43,28 @@ def add_barrier(agent, T):
     agent.DR = D
 
 
-def change_goal(linear_rl, new_env):
+def change_goal(agent, new_reward):
     """
     New environment is the same as the old one, except we update the value of one of the terminal (goal) states. We can use the old precomputed DR 
     to get a new DR and include the new information as well.
 
     Args:
-    linear_rl (LinearRL class): The LinearRL agent 
-    new_env (string): The name of the new environment
+    agent (LinearRL class): The LinearRL agent 
+    new_reward (list): The name of the new environment
     """
-    raise NotImplementedError
+    # Update the reward with the new reward
+    r_loc = np.argwhere(agent.terminals)[1]
+    agent.r[r_loc] = new_reward
+    
+    # Get new reward and calculate expr
+    r_new = agent.r
+    expr_new = np.exp(r_new[agent.terminals] / agent._lambda)
+
+    # Use the new reward and precomputed DR to update Z values
+    Z_new = np.zeros(len(r_new))
+    Z_new[~agent.terminals] = agent.DR[~agent.terminals][:,~agent.terminals] @ agent.P @ expr_new
+    Z_new[agent.terminals] = expr_new
+    agent.Z = Z_new
 
 def new_goal(agent, T, loc):
     """

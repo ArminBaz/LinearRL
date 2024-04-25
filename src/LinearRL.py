@@ -11,11 +11,10 @@ class LinearRL:
     def __init__(self, env_name, _lambda):
         self.env = gym.make(env_name)
         self.start_loc = self.env.unwrapped.start_loc
-        self.target_loc = self.env.unwrapped.target_loc
+        self.target_locs = self.env.unwrapped.target_locs
         self.maze = self.env.unwrapped.maze
         self.size = self.maze.size
         self.height, self.width = self.maze.shape
-        self.target_locs = [self.target_loc]
         self.mapping = create_transition_matrix_mapping(self.maze)
         self.T = get_transition_matrix(self.env, self.size, self.mapping)
         
@@ -26,7 +25,14 @@ class LinearRL:
         self.P = self.T[~self.terminals][:,self.terminals]
         # Calculate reward
         self.r = np.full(len(self.T), -0.1)     # our reward at each non-terminal state to be -0.1
-        self.r[self.terminals] = 1              # reward at terminal state is 1
+        # if we have multiple terminal states
+        if len(self.terminals) > 1:
+            r1 = np.argwhere(self.terminals)[0]
+            r2 = np.argwhere(self.terminals)[1]
+            self.r[r1] = 5
+            self.r[r2] = 1
+        else:
+            self.r[self.terminals] = 1              # reward at terminal state is 1
         self.expr = np.exp(self.r[self.terminals] / _lambda)
 
         # Params
@@ -34,12 +40,17 @@ class LinearRL:
         self.DR = np.eye(self.size)
         self.Z = np.zeros(self.size)
     
-    def update_V(self):
+    def update_Z(self):
         """
         Updates the value of our states according to equations from paper
         """
         self.Z[~self.terminals] = self.DR[~self.terminals][:,~self.terminals] @ self.P @ self.expr
         self.Z[self.terminals] = self.expr
+    
+    def update_V(self):
+        """
+        Updates the value using our Z-values
+        """
         self.V = np.round(np.log(self.Z), 2)
     
     def select_action(self, state):
@@ -71,9 +82,10 @@ class LinearRL:
         self.DR = np.linalg.inv(L)
 
         # Update the value
+        self.update_Z()
         self.update_V()
 
-    def replan(self, new_env, experiment, loc=None):
+    def replan(self, experiment, new_env=None, loc=None):
         """
         Function to replan, using equations from paper.
 
@@ -81,15 +93,15 @@ class LinearRL:
         environment in and specificy the changed location, but this is the way I'm doing it for now.
 
         Args:
-            new_env (maze): The updated environment
             experiment (string): The experiment we are running
+            new_env (maze): The updated environment
         """
         # Load the new environment
-        new_env = gym.make(new_env)
-
-        # Get the transition matrix of the new environment
-        new_mapping = create_transition_matrix_mapping(new_env.unwrapped.maze)
-        T = get_transition_matrix(new_env, new_env.unwrapped.maze.size, new_mapping)
+        if new_env is not None:
+            new_env = gym.make(new_env)
+            # Get the transition matrix of the new environment
+            new_mapping = create_transition_matrix_mapping(new_env.unwrapped.maze)
+            T = get_transition_matrix(new_env, new_env.unwrapped.maze.size, new_mapping)
 
         # Check if transition structure changes:
         if experiment == "add_barrier":
@@ -100,7 +112,7 @@ class LinearRL:
         # Check if terminal states are updated:
         elif experiment == "update_goal":
             print("Replanning with new terminal state values...")
-            raise NotImplementedError
+            change_goal(self, new_reward=20)
 
         # Check if we are planning towards a new goal:
         elif experiment == "new_goal":
@@ -113,5 +125,6 @@ class LinearRL:
         self.update_V()
 
         # Set new environment
-        self.env = new_env
-        self.maze = self.env.unwrapped.maze
+        if new_env is not None:
+            self.env = new_env
+            self.maze = self.env.unwrapped.maze
