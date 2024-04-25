@@ -1,13 +1,13 @@
 # LinearRL - Python Implementation
 This repository is a Python implementation of ["Linear reinforcement learning in planning, grid fields, and cognitive control"](https://www.nature.com/articles/s41467-021-25123-3) by Piray et al. <br> <br>
 
-**Another Note**: Although I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/). <br> <br>
+**Another Note**: Although I believe this to be a faithful reimplementation of the original paper. It is *not* an official implementation, for the official implementation please visit [this repository](https://github.com/payampiray/LinearRL/). <br>
 
-Please note that the detour task is the only 1-1 task as presented in the paper, for the other two tasks, I used inspiration from the great paper by Russek et al. ["Predictive representations can link model- based reinforcement learning to model-free mechanisms"](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005768). Even though the latent learning and change in goal tasks are not presented like this in the original LinearRL paper, the equations I used are from the original paper and still hold up.
+The detour task is the only 1-1 task as presented in the paper, for the other two tasks, I used inspiration from the great paper by Russek et al. ["Predictive representations can link model- based reinforcement learning to model-free mechanisms"](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005768). Even though the latent learning and change in goal tasks are not presented like this in the original LinearRL paper, the equations I used are from the original paper and still hold up.
 
 ## Introduction
 The code converts the LinearRL framework introduced by Piray et al. into Python. Additionally, it is converted to be used with environments that have a similar structure to OpenAI's Gym reinforcement learning environments. <br> <br>
-**Please Note** although the code structure is made to handle gym-like function calls. This code will not be compatible with any environment. It has been specifically designed for the tabular environments that I have created, see `gym-env/` for more details. <br> <br>
+Although the code structure is made to handle gym-like function calls. This code will **not be compatible** with any environment. It has been specifically designed for the tabular environments that I have created, see `gym-env/` for more details. <br> <br>
 
 ## Conda & Gym Environments
 ### Conda Environment
