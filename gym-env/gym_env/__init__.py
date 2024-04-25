@@ -27,6 +27,13 @@ register(
     max_episode_steps=2000,
 )
 
+# 10x10 Two Goals
+register(
+    id="maze-10x10-two-goal",
+    entry_point="gym_env.envs:MazeEnv10x10_2G",
+    max_episode_steps=2000,
+)
+
 # Tolman latent task
 register(
     id="tolman-10x10-latent",

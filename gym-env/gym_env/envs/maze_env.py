@@ -21,8 +21,10 @@ class MazeEnv(gym.Env):
         start = np.where(self.maze == 'S')
         target = np.where(self.maze == 'G')
 
-        self.start_loc = np.array([start[0][0], start[1][0]])
-        self.target_loc = np.array([target[0][0], target[1][0]])
+        # self.start_loc = np.array([start[0][0], start[1][0]])
+        self.start_loc = np.argwhere(self.maze == 'S')[0]
+        # self.target_loc = np.array([target[0][0], target[1][0]])
+        self.target_locs = np.argwhere(self.maze == 'G')
         self.agent_loc = self.start_loc
 
         # Size of maze and pygame window
@@ -37,7 +39,7 @@ class MazeEnv(gym.Env):
         self.observation_space = spaces.Dict(
             {
                 "agent": spaces.Box(low=np.array([0,0]), high=np.array([self.num_rows-1, self.num_cols-1]), shape=(2,), dtype=int),
-                "target": spaces.Box(low=np.array([0,0]), high=np.array([self.num_rows-1, self.num_cols-1]), shape=(2,), dtype=int),
+                "targets": spaces.Box(low=np.tile(np.array([0, 0]), (len(self.target_locs), 1)), high=np.tile(np.array([self.num_rows-1, self.num_cols-1]), (len(self.target_locs), 1)), shape=(len(self.target_locs), 2), dtype=int),
             }
         )
 
@@ -52,7 +54,7 @@ class MazeEnv(gym.Env):
         self.window = None
         self.clock = None
 
-    def reset(self, seed=None):
+    def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
@@ -75,13 +77,13 @@ class MazeEnv(gym.Env):
 
         new_loc = np.copy(self.agent_loc)
         new_loc += direction
-
         # Check if the new position is valid
         if self._is_valid_position(new_loc):
             self.agent_loc = new_loc
 
         # Check if terminated
-        terminated = np.array_equal(self.agent_loc, self.target_loc)
+        # terminated = np.array_equal(self.agent_loc, self.target_loc)
+        terminated = self._is_at_target(self.agent_loc)
         reward = 1 if terminated else 0  # Binary sparse rewards
         
         if self.render_mode == "human":
@@ -129,10 +131,31 @@ class MazeEnv(gym.Env):
             new_loc = np.copy(state)
             new_loc += direction
             if self._is_valid_position(new_loc):
-                terminated = np.array_equal(new_loc, self.target_loc)
+                terminated = self._is_at_target(new_loc)
+                # terminated = np.array_equal(new_loc, self.target_loc)
                 next_states.append((new_loc, terminated))
         
         return next_states
+    
+    def get_walls(self):
+        """
+        Returns a list of all the walls (blocked squares)
+        """
+        walls = []
+        # Loop through the maze
+        for row in range(self.num_rows):
+            for col in range(self.num_cols):
+                # If square is blocked
+                if self.maze[row, col] == '1':
+                    walls.append((row,col))
+        
+        return walls
+    
+    def _is_at_target(self, current_loc):
+        """
+        Check to see if current_loc is at one of the target_locs
+        """
+        return np.any(np.all(self.target_locs == current_loc, axis=1))
     
     def _read_maze_file(self, maze_file):
         dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -144,16 +167,14 @@ class MazeEnv(gym.Env):
         """
         Observation, returns the agent and target positions
         """
-        return {"agent": self.agent_loc, "target":self.target_loc}
+        return {"agent": self.agent_loc, "targets":self.target_locs}
     
     def _get_info(self):
         """
         Information, returns the manhattan (L1) distance between agent and target.
         """
         return {
-            "distance": np.linalg.norm(
-                self.agent_loc - self.target_loc, ord=1
-            )
+            "distances": np.linalg.norm(self.target_locs - self.agent_loc, ord=1, axis=1)
         }
 
     def _is_valid_position(self, pos):
@@ -204,15 +225,26 @@ class MazeEnv(gym.Env):
             self.window_size / self.num_cols
         )  # The size of a single grid square in pixels
 
-        # Draw target
-        pygame.draw.rect(
-            canvas,
-            (255, 0, 0),
-            pygame.Rect(
-                pix_square_size * self.target_loc,
-                (pix_square_size, pix_square_size),
-            ),
-        )
+        # Draw targets
+        for target_loc in self.target_locs:
+            pygame.draw.rect(
+                canvas,
+                (255, 0, 0),
+                pygame.Rect(
+                    target_loc[1] * pix_square_size,
+                    target_loc[0] * pix_square_size,
+                    pix_square_size,
+                    pix_square_size
+                )
+            )
+        # pygame.draw.rect(
+        #     canvas,
+        #     (255, 0, 0),
+        #     pygame.Rect(
+        #         pix_square_size * self.target_loc,
+        #         (pix_square_size, pix_square_size),
+        #     ),
+        # )
         # Draw start
         pygame.draw.rect(
             canvas,
@@ -294,6 +326,10 @@ class MazeEnvTolmanNB(MazeEnv):
 class MazeEnvTolmanB(MazeEnv):
     def __init__(self):
         super(MazeEnvTolmanB, self).__init__(maze_file="tolman_9x9_v1.npy")
+
+class MazeEnv10x10_2G(MazeEnv):
+    def __init__(self):
+        super(MazeEnv10x10_2G, self).__init__(maze_file="maze_10x10_2g.npy")
 
 class MazeEnv15x15(MazeEnv):
     def __init__(self):
